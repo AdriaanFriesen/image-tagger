@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+        <meta http-equiv="Content-Security-Policy" content="img-src 'self' blob:; default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+        <link href="./stylesheet.css" rel="stylesheet">
+        <title>Image Tagger</title>
+    </head>
+    <body>
+        <div id="notification-popup" class="flex column popup hide">
+            <span id="notification-popup-label" class="popup-label"></span>
+        </div>
+        <div id="search-screen">
+            <div class="flex column">
+                <div id="top-bar">
+                    <div>
+                        <input type="text" autocapitalize="off" spellcheck="false" id="search" suggestor="search-suggestor">
+                        <div class="tag-suggestor hide" id="search-suggestor" suggestee="search" show-count="true"></div>
+                    </div>
+                </div>
+                <div class="flex column" id="image-window">
+                </div>
+            </div>
+            <svg id="sidebar-open" class="sidebar-button" x="0" y="0" viewBox="0 0 1000 1000">
+                <path d="M10,155h979v131.4H10V155z"/>
+                <path d="M10,431h979v131.4H10V431L10,431z"/>
+                <path d="M11,713.6h979V845H11V713.6z"/>
+            </svg>
+            <div id="sidebar" class="flex column hide">
+                <svg id="sidebar-close" class="sidebar-button" x="0" y="0" viewBox="0 0 1000 1000">
+                    <path d="M849.9,990L990,849.9L639.9,499.9L990,150L849.9,10L499.9,359.9L150,10L10,150l349.9,349.9L10,849.9L150,990l349.9-350.1L849.9,990z"/>
+                </svg>
+                <div id="sidebar-separator"></div>
+                <div id="sidebar-options-container" class="flex column">
+                    <span id="open-folder" class="sidebar-option">
+                        Open new folder
+                    </span>
+                    <span id="batch-add-tag" class="sidebar-option">
+                        Add tag to all images
+                    </span>
+                    <span id="batch-remove-tag" class="sidebar-option">
+                        Remove tag from all images
+                    </span>
+                    <span id="rename-tag" class="sidebar-option">
+                        Rename tag
+                    </span>
+                </div>
+            </div>
+            <div id="add-remove-popup" class="flex column popup hide">
+                <span id="add-remove-popup-label" class="popup-label"></span>
+                <input type="text" autocapitalize="off" spellcheck="false" id="add-remove-popup-input">
+                <div class="flex row popup-buttons-container">
+                    <button id="add-remove-popup-cancel">Cancel</button>
+                    <button id="add-remove-popup-ok">OK</button>
+                </div>
+            </div>
+            <div id="rename-popup" class="flex column popup hide">
+                <span id="rename-popup-label" class="popup-label"></span>
+                <div class="flex row">
+                    <span>Old tag name:</span>
+                    <div style="width: 5px;"></div>
+                    <div>
+                        <input type="text" autocapitalize="off" spellcheck="false" id="rename-popup-old-tag" suggestor="rename-popup-old-tag-suggestor">
+                        <div id="rename-popup-old-tag-suggestor" class="tag-suggestor" suggestee="rename-popup-old-tag" show-count="true"></div>
+                    </div>
+                </div>
+                <div class="flex row">
+                    <span>New tag name:</span>
+                    <div style="width: 5px;"></div>
+                    <div>
+                        <input type="text" autocapitalize="off" spellcheck="false" id="rename-popup-new-tag" suggestor="rename-popup-new-tag-suggestor">
+                        <div id="rename-popup-new-tag-suggestor" class="tag-suggestor" suggestee="rename-popup-new-tag" show-count="true"></div>
+                    </div>
+                </div>
+                <div class="flex row popup-buttons-container">
+                    <button id="rename-popup-cancel">Cancel</button>
+                    <button id="rename-popup-ok">OK</button>
+                </div>
+            </div>
+        </div>
+        <div class="flex column hide" id="image-screen">
+            <div class="flex column" id="image-screen-content">
+                <div id="image-screen-image-container">
+                    <img id="image-screen-image">
+                </div>
+                <div class="flex column" id="tag-area">
+                    <div class="flex row" id="tags"></div>
+                    <div class="flex row" id="tag-adding">
+                        <div>
+                            <input type="text" autocapitalize="off" spellcheck="false" id="tag-input" suggestor="tag-add-suggestor">
+                            <div class="tag-suggestor hide" id="tag-add-suggestor" suggestee="tag-input" show-count="false"></div>
+                        </div>
+                        <button id="tag-add">Add</button>
+                    </div>
+                </div>
+            </div>
+            <div style="height: 600px;"></div>
+            </div>
+        </div>
+        <script src="renderer.js"></script>
+    </body>
+</html>
