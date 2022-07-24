@@ -1,8 +1,8 @@
 // Modules to control application life and create native browser window
-const electron = require('electron');
-const { BrowserWindow, app, ipcMain, dialog } = require('electron');
-const path = require('path');
-const fs = require('fs');
+const electron = require("electron");
+const { BrowserWindow, app, ipcMain, dialog, globalShortcut } = require("electron");
+const path = require("path");
+const fs = require("fs");
 
 function createWindow() {
     // Create the browser window.
@@ -11,7 +11,7 @@ function createWindow() {
         height: electron.screen.getPrimaryDisplay().size.height,
         // fullscreen: true,
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js')
+            preload: path.join(__dirname, "preload.js")
         }
     });
 
@@ -20,10 +20,10 @@ function createWindow() {
     // mainWindow.focus();
     
     // and load the index.html of the app.
-    mainWindow.loadFile('index.html');
+    mainWindow.loadFile(path.join(__dirname, "index.html"));
     
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 
     return mainWindow
 }
@@ -120,21 +120,22 @@ app.whenReady().then(() => {
         storeDatabase(null, database);
     });
 
-    app.on('activate', function() {
+    app.on("activate", function() {
         // On macOS it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.
         if (BrowserWindow.getAllWindows().length === 0) createWindow();
     });
-    
-    
-    // mainWindow.webContents.send("log", "hello from app.js");
+
+    globalShortcut.register("CommandOrControl+Shift+I", () => {
+        mainWindow.webContents.toggleDevTools();
+    });
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
-app.on('window-all-closed', function () {
-    if (process.platform !== 'darwin') app.quit();
+app.on("window-all-closed", function () {
+    if (process.platform !== "darwin") app.quit();
 });
 
 // In this file you can include the rest of your app's specific main process

@@ -13,10 +13,11 @@ var highlightedSuggestionIndex;
 
 async function main() {
     database = await getDatabase();
-    activeFolder = await getActiveFolder();
-    images = await getImages();
-    verifyFolderInDatabase(activeFolder, images);
-    displayImages(images)
+    if (await getActiveFolder()) {
+        images = await getImages();
+        verifyFolderInDatabase(activeFolder, images);
+        displayImages(images)
+    }
 }
 
 async function displayImages(images) {
@@ -61,24 +62,33 @@ async function storeDatabase() {
 
 async function getActiveFolder() {
     if (database["activeFolder"] !== "") {
-        return database["activeFolder"];
+        activeFolder = database["activeFolder"];
+        return true;
     }
     else {
-        await setActiveFolder();
-        return database["activeFolder"];
+        if (await setActiveFolder()) {
+            activeFolder = database["activeFolder"];
+            return true;
+        }
+        else {
+            return false;
+        }        
     }
 }
 
 async function setActiveFolder() {
     let askResult = await window.taggingAPI.askDirectory();
-    while (askResult.cancelled) {
-        askResult = await window.taggingAPI.askDirectory();
+    if (!askResult.canceled) {
+        database["activeFolder"] = askResult.filePaths[0].replace(/\\/g, "/");
+        activeFolder = askResult.filePaths[0].replace(/\\/g, "/");
+        images = await getImages();
+        verifyFolderInDatabase(activeFolder, images);
+        storeDatabase();
+        return true;
     }
-    database["activeFolder"] = askResult.filePaths[0].replace(/\\/g, "/");
-    activeFolder = askResult.filePaths[0].replace(/\\/g, "/");
-    images = await getImages();
-    verifyFolderInDatabase(activeFolder, images);
-    storeDatabase();
+    else {
+        return false;
+    }
 }
 
 async function getImages() {

@@ -2,7 +2,7 @@
     "name": "image-tagger",
     "version": "1.0.0",
     "description": "An image tagger build with Electron",
-    "main": "main.js",
+    "main": "app/main.js",
     "scripts": {
         "start": "electron ."
     },

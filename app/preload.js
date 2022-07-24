@@ -1,4 +1,4 @@
-const { ipcRenderer, contextBridge } = require('electron');
+const { ipcRenderer, contextBridge } = require("electron");
 
 contextBridge.exposeInMainWorld("taggingAPI", {
     getImages: (directory) => ipcRenderer.invoke("getImages", directory),
@@ -7,6 +7,5 @@ contextBridge.exposeInMainWorld("taggingAPI", {
     storeDatabase: (database) => ipcRenderer.send("storeDatabase", database),
     addTagToAll: (images, tag) => ipcRenderer.send("addTagToAll", images, tag),
     removeTagFromAll: (images, tag) => ipcRenderer.send("removeTagFromAll", images, tag),
-    renameTag: (images, oldTag, newTag) => ipcRenderer.send("renameTag", images, oldTag, newTag),
-    toggleDevTools: () => ipcRenderer.send("toggleDevTools")
+    renameTag: (images, oldTag, newTag) => ipcRenderer.send("renameTag", images, oldTag, newTag)
 })
