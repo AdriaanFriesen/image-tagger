@@ -228,10 +228,10 @@ function cleanTags(tagList) {
 }
 
 function handleAddTag(event) {
-    let tag = $("tag-input").value;
     if (event.type === "click" || (event.type === "keydown" && event.code === "Enter" && $("tag-add-suggestor").classList.contains("hide"))) {
-        if (viewingImage && $("tag-input").value !== "") {
-            tag = tag.trim().split(" ");
+        let tag = $("tag-input").value;
+        if (viewingImage && tag !== "") {
+            tag = tag.trim(" ").split(" ");
             tag.forEach(function(tag) {
                 addTag($("image-screen-image").getAttribute("src"), tag);
             });
@@ -267,35 +267,45 @@ function handleTagClicked(event) {
 
 document.addEventListener("keydown", function(event) {
     if (event.key === "Escape") {
+        let performedAction = false;
         if (viewingImage) {
             closeImageViewer();
             $("tag-input").value = "";
+            performedAction = true;
         }
-        else {
+        if (!performedAction) {
             Array.from(document.getElementsByClassName("tag-suggestor")).forEach(function(suggestions) {
-                let suggestee = suggestions.getAttribute("suggestee");
+                let suggestee = $(suggestions.getAttribute("suggestee"));
                 if (document.activeElement === suggestee) {
-                    closeSuggestor(suggestions);
-                    suggestee.blur();
+                    if (!suggestions.classList.contains("hide")) {
+                        closeSuggestor(suggestions);
+                    }
+                    else {
+                        suggestee.blur();
+                    }
                 }
             });
-            if ($("add-remove-popup").classList.contains("hide") && $("rename-popup").classList.contains("hide")) {
-                toggleSidebar();
-            }
-            else if (!$("add-remove-popup").classList.contains("hide")) {
-                document.dispatchEvent(new CustomEvent("addRemovePopupFinish", {
-                    detail: {
-                        cancelled: true
-                    }
-                }));
-            }
-            else if (!$("rename-popup").classList.contains("hide")) {
-                document.dispatchEvent(new CustomEvent("renamePopupFinish", {
-                    detail: {
-                        cancelled: true
-                    }
-                }));
-            }
+            performedAction = true;
+        }
+        if (!performedAction && $("add-remove-popup").classList.contains("hide") && $("rename-popup").classList.contains("hide")) {
+            toggleSidebar();
+            performedAction = true;
+        }
+        if (!performedAction && !$("add-remove-popup").classList.contains("hide")) {
+            document.dispatchEvent(new CustomEvent("addRemovePopupFinish", {
+                detail: {
+                    cancelled: true
+                }
+            }));
+            performedAction = true;
+        }
+        if (!performedAction && !$("rename-popup").classList.contains("hide")) {
+            document.dispatchEvent(new CustomEvent("renamePopupFinish", {
+                detail: {
+                    cancelled: true
+                }
+            }));
+            performedAction = true;
         }
     }
 });
@@ -327,9 +337,7 @@ Array.from(document.getElementsByClassName("tag-suggestor")).forEach(function(su
     $(suggestor.getAttribute("suggestee")).addEventListener("keydown", function(event) {
         let suggestor = $(event.target.getAttribute("suggestor"));
         if (event.key === "Tab" && document.activeElement === event.target) {
-            if (!suggestor.classList.contains("hide")) {
-                event.preventDefault();
-            }
+            event.preventDefault();
         }
         if (event.key === "Enter" || event.key === "Tab") {
             if (suggestor.childNodes.length - 1 >= highlightedSuggestionIndex) {
@@ -362,13 +370,27 @@ function handleSuggesteeChange(event, manualQuery, manualSuggestor, forceOpen) {
         query = manualQuery
         suggestor = manualSuggestor;
     }
-    let lastQuery = query.trim().split(" ").at(-1);
     let allTags = getAllTags(images);
     let sortedTags = [];
     allTags.forEach(function(tag) {
         sortedTags.push(tag.tag);
     });
-    let completables = getListOfCompletables(lastQuery, sortedTags);
+    let lastQuery;
+    let completables;
+    if (query.endsWith(" ")) {
+        lastQuery = "";
+        completables = [];
+        sortedTags.forEach((tag) => {
+            completables.push({
+                completable: tag,
+                location: 0
+            });
+        });
+    }
+    else {
+        lastQuery = query.trim(" ").split(" ").at(-1);
+        completables = getListOfCompletables(lastQuery, sortedTags);
+    }
     let suggestions = [];
     completables.forEach(function(completable, index) {
         // if (index < 5) {
@@ -389,13 +411,14 @@ function handleSuggesteeChange(event, manualQuery, manualSuggestor, forceOpen) {
             });
         // }
     });
-    let suggestionsContainsQuery = false;
-    suggestions.forEach(function(suggestion) {
-        if (suggestion.searchText === lastQuery) {
-            suggestionsContainsQuery = true;
-        }
-    });
-    if (forceOpen || (query !== "" && !query.endsWith(" ") && !suggestionsContainsQuery && suggestions.length !== 0)) {
+    // let suggestionsContainsQuery = false;
+    // suggestions.forEach(function(suggestion) { // determine whether the tag being typed is equal to any existing tag, then hide it (in the next if statement)
+    //     if (suggestion.searchText === lastQuery) {
+    //         suggestionsContainsQuery = true;
+    //     }
+    // });
+    // if ((forceOpen || query !== "" && !query.endsWith(" ")) && !suggestionsContainsQuery && suggestions.length !== 0) {
+    if ((forceOpen || query !== "" && !query.endsWith(" ")) && suggestions.length !== 0) {
         openSuggestor(suggestor);
         showSuggestions(suggestor, suggestions)
         highlightSuggestion(suggestor, 0);
@@ -418,7 +441,7 @@ function search(query) {
         displayImages(images);
     }
     else {
-        let queryTags = query.trim().split(" ");
+        let queryTags = query.trim(" ").split(" ");
         let filteredImages = [];
         images.forEach(function(image) {
             let matchesQuery = true;
@@ -571,7 +594,7 @@ $("batch-add-tag").addEventListener("click", async function(event) {
     popupAddRemove().then(function handleInputRecievedAdd(tag) {
         if (tag !== "") {
             closeAddRemovePopup();
-            tag = tag.trim().split(" ");
+            tag = tag.trim(" ").split(" ");
             tag.forEach(function(tag) {
                 addTagToAll(images, tag);
             });
@@ -598,7 +621,7 @@ $("batch-remove-tag").addEventListener("click", async function(event) {
     popupAddRemove().then(function handleInputRecievedRemove(tag) {
         if (tag !== "") {
             closeAddRemovePopup();
-            tag = tag.trim().split(" ");
+            tag = tag.trim(" ").split(" ");
             tag.forEach(function(tag) {
                 removeTagFromAll(images, tag);
             });
@@ -768,18 +791,21 @@ async function handleClickSuggestion(event, manualSuggestion, manualSuggestee) {
         suggestionText = manualSuggestion;
         suggestee = manualSuggestee
     }
-    suggestee.focus();
-    let currentSearch = suggestee.value;
-    let currentSearchTags = currentSearch.split(" ");
-    suggestee.value = "";
-    currentSearchTags.forEach(function(tag, index) {
-        if (index === currentSearchTags.length - 2) {
-            suggestee.value += tag + " ";
-        }
-    });
-    suggestee.value += suggestionText;
-    handleSuggesteeChange(undefined, suggestionText, $(suggestee.getAttribute("suggestor")));
-    closeSuggestor($(suggestee.getAttribute("suggestor")));
+    if (!$(suggestee.getAttribute("suggestor")).classList.contains("hide")) {
+        suggestee.focus();
+        let currentSearch = suggestee.value;
+        let currentSearchTags = currentSearch.trim(" ").split(" ");
+        let lastQuery = currentSearch.at(-1);
+        suggestee.value = "";
+        currentSearchTags.forEach(function(tag, index) {
+            if (index !== currentSearchTags.length - 1) {
+                suggestee.value += tag + " ";
+            }
+        });
+        suggestee.value += suggestionText;
+        handleSuggesteeChange(undefined, suggestee.value, $(suggestee.getAttribute("suggestor")), false);
+        closeSuggestor($(suggestee.getAttribute("suggestor")));
+    }
 }
 
 function highlightSuggestion(suggestor, index) {
@@ -791,6 +817,22 @@ function highlightSuggestion(suggestor, index) {
         suggestor.childNodes[index * 2].classList.add("highlight");
     }
 }
+
+document.addEventListener("mousemove", function(event) {
+    Array.from(document.getElementsByClassName("tag-suggestor")).forEach(function(suggestor) {
+        let onSuggestion = false;
+        let suggestionIndex;
+        suggestor.childNodes.forEach(function(suggestion, index) {
+            if (event.target === suggestion && !event.target.classList.contains("suggestion-separator")) {
+                onSuggestion = true;
+                suggestionIndex = index / 2;
+            }
+        });
+        if (onSuggestion) {
+            highlightSuggestion(suggestor, suggestionIndex);
+        }
+    });
+});
 
 
 main();

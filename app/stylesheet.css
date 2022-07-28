@@ -63,6 +63,7 @@ html {
 
 .tag-suggestor::-webkit-scrollbar {
     background-color: #61617c;
+    padding-left: 2px;
 }
 
 .tag-suggestor::-webkit-scrollbar-thumb {

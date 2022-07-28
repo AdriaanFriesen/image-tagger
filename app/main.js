@@ -9,7 +9,7 @@ function createWindow() {
     const mainWindow = new BrowserWindow({
         width: electron.screen.getPrimaryDisplay().size.width,
         height: electron.screen.getPrimaryDisplay().size.height,
-        // fullscreen: true,
+        titleBarStyle: "default",
         webPreferences: {
             preload: path.join(__dirname, "preload.js")
         }
@@ -23,7 +23,7 @@ function createWindow() {
     mainWindow.loadFile(path.join(__dirname, "index.html"));
     
     // Open the DevTools.
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 
     return mainWindow
 }
@@ -124,10 +124,6 @@ app.whenReady().then(() => {
         // On macOS it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.
         if (BrowserWindow.getAllWindows().length === 0) createWindow();
-    });
-
-    globalShortcut.register("CommandOrControl+Shift+I", () => {
-        mainWindow.webContents.toggleDevTools();
     });
 })
 
