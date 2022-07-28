@@ -10,6 +10,7 @@ function createWindow() {
         width: electron.screen.getPrimaryDisplay().size.width,
         height: electron.screen.getPrimaryDisplay().size.height,
         titleBarStyle: "default",
+        icon: path.join(__dirname, "icon.ico"),
         webPreferences: {
             preload: path.join(__dirname, "preload.js")
         }
