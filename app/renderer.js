@@ -268,11 +268,7 @@ function handleTagClicked(event) {
 document.addEventListener("keydown", function(event) {
     if (event.key === "Escape") {
         let performedAction = false;
-        if (viewingImage) {
-            closeImageViewer();
-            $("tag-input").value = "";
-            performedAction = true;
-        }
+        console.log(performedAction);
         if (!performedAction) {
             Array.from(document.getElementsByClassName("tag-suggestor")).forEach(function(suggestions) {
                 let suggestee = $(suggestions.getAttribute("suggestee"));
@@ -283,14 +279,22 @@ document.addEventListener("keydown", function(event) {
                     else {
                         suggestee.blur();
                     }
+                    performedAction = true;
                 }
             });
+        }
+        console.log(performedAction);
+        if (!performedAction && viewingImage) {
+            closeImageViewer();
+            $("tag-input").value = "";
             performedAction = true;
         }
+        console.log(performedAction);
         if (!performedAction && $("add-remove-popup").classList.contains("hide") && $("rename-popup").classList.contains("hide")) {
             toggleSidebar();
             performedAction = true;
         }
+        console.log(performedAction);
         if (!performedAction && !$("add-remove-popup").classList.contains("hide")) {
             document.dispatchEvent(new CustomEvent("addRemovePopupFinish", {
                 detail: {
@@ -299,6 +303,7 @@ document.addEventListener("keydown", function(event) {
             }));
             performedAction = true;
         }
+        console.log(performedAction);
         if (!performedAction && !$("rename-popup").classList.contains("hide")) {
             document.dispatchEvent(new CustomEvent("renamePopupFinish", {
                 detail: {
@@ -307,6 +312,7 @@ document.addEventListener("keydown", function(event) {
             }));
             performedAction = true;
         }
+        console.log(performedAction);
     }
 });
 
